@@ -2,6 +2,7 @@ import React, { useContext, useEffect, useState } from 'react';
 import Axios from 'axios';
 import Snippet from './Snippet';
 import SnippetEditor from './SnippetEditor';
+import { Link } from 'react-router-dom';
 import './Home.scss';
 import UserContext from '../../context/userContext';
 
@@ -47,7 +48,7 @@ function Home(){
                 Add Snippet
             </button>
         )}
-        {snippetEditorOpen && (
+        {snippetEditorOpen && user !== null &&(
             <SnippetEditor 
                 setSnippetEditorOpen={setSnippetEditorOpen} 
                 getSnippets={getSnippets}
@@ -64,6 +65,7 @@ function Home(){
                 programming. For this reason snippets are primarily used for simple sections of code (with little 
                 logic), or for boilerplate, such as copyright notices, function prototypes, common control 
                 structures, or standard library imports.</p>
+                <Link to="/register"><button className="register">Register Here</button></Link> 
             </div>
         )}
         

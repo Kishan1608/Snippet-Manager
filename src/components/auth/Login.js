@@ -2,11 +2,13 @@ import Axios from "axios";
 import React, { useContext, useState } from 'react';
 import {Link, useHistory} from 'react-router-dom';
 import UserContext from "../../context/userContext";
+import ErrorMessage from "../misc/ErrorMessage";
 import './AuthForm.scss';
 
 function Login(){
     const [formEmail, setFormEmail] = useState("");
     const [formPassword, setFormPassword] = useState("");
+    const [errormessage, setErrorMessage] = useState(null);
 
     const {getUser} = useContext(UserContext);
 
@@ -19,8 +21,16 @@ function Login(){
             email: formEmail,
             password: formPassword,
         };
-
-        await Axios.post("http://localhost:5000/auth/login", loginData);
+        try{
+            await Axios.post("http://localhost:5000/auth/login", loginData);
+        }catch(err){
+            if(err.response){
+                if(err.response.data.errormessage){
+                    setErrorMessage(err.response.data.errormessage);
+                }
+            }
+            return
+        }
 
         await getUser();
 
@@ -29,6 +39,9 @@ function Login(){
 
     return <div className="auth-form">
         <h2>Login</h2>
+        {
+            errormessage && <ErrorMessage message={errormessage} clear={() => setErrorMessage(null)}/>
+        }
         <form className="form" onSubmit={login}>
             <label htmlFor="form-email">Email</label>
             <input 

@@ -22,7 +22,7 @@ function Navbar(){
             {user === null ? (
                 <Link to="/register"><button>Sign Up</button></Link>
             ) : (
-                <button onClick={logout}>Logout</button>
+                <Link to="/"> <button onClick={logout}>Logout</button></Link>
             )
             }
         </div>

@@ -2,12 +2,14 @@ import Axios from "axios";
 import React, { useContext, useState } from 'react';
 import {Link, useHistory} from 'react-router-dom';
 import UserContext from "../../context/userContext";
+import ErrorMessage from "../misc/ErrorMessage";
 import './AuthForm.scss';
 
 function Register(){
     const [formEmail, setFormEmail] = useState("");
     const [formPassword, setFormPassword] = useState("");
     const [formPasswordVerify, setFormPasswordVerify] = useState("");
+    const [errormessage, setErrorMessage] = useState(null);
 
     const {getUser} = useContext(UserContext);
 
@@ -22,7 +24,16 @@ function Register(){
             passwordVerify: formPasswordVerify,
         };
 
-        await Axios.post("http://localhost:5000/auth/", registerData);
+        try{
+            await Axios.post("http://localhost:5000/auth/", registerData);
+        }catch(err){
+            if(err.response){
+                if(err.response.data.errormessage){
+                    setErrorMessage(err.response.data.errormessage);
+                }
+            }
+            return
+        }
 
         await getUser();
 
@@ -31,6 +42,12 @@ function Register(){
 
     return <div className="auth-form">
         <h2>Register a new account</h2>
+        {
+            errormessage && <ErrorMessage 
+                message={errormessage} 
+                clear={() => setErrorMessage(null)}
+            />
+        }
         <form className="form" onSubmit={register}>
             <label htmlFor="form-email">Email</label>
             <input 

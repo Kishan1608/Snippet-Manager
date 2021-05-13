@@ -7,6 +7,18 @@
     }
 
     .card{
-        @include card()
+        @include card();
+        text-align: center;
+    }
+
+    .register{
+        @include btn();
+        background: var(--primary-color);
+        color: var(--text-light-color);
+        margin-top: 1rem;
+        &:hover{
+            background: var(--light-color);
+            color: var(--primary-color);
+        }
     }
 }
