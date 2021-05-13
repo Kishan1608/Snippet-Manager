@@ -1,0 +1,22 @@
+@import "../../style/mixins.scss";
+
+.navbar{
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 2rem;
+    padding: 10px;
+    border-radius: 5px;
+    color: var(--text-light-color);
+
+    button{
+        @include btn();
+        background: var(--light-color);
+        color: var(--text-link-color);
+        font-weight: bold;
+    }
+
+    a{
+        color: unset;
+        margin-right: 2rem;
+    }
+}
