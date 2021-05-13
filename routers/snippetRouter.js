@@ -1,18 +1,17 @@
 const router = require("express").Router();
-const { ensureIndexes } = require("../models/snippetModels");
-const Snippet = require("../models/snippetModels");
 const SnippetModel = require('../models/snippetModels');
+const Auth = require('../middleware/auth');
 
-router.get("/", async(req, res) => {
+router.get("/", Auth, async(req, res) => {
     try{
-        const snippet = await SnippetModel.find();
+        const snippet = await SnippetModel.find({ user: req.user});
         res.json(snippet);
     }catch{
         res.status(500).send();
     }
 })
 
-router.post("/", async (req, res) => {
+router.post("/", Auth, async (req, res) => {
     try{
     const {title, description, code} = req.body;
 
@@ -23,7 +22,10 @@ router.post("/", async (req, res) => {
     }
    
     const newSnippet = new SnippetModel({
-        title, description, code
+        title, 
+        description, 
+        code,
+        user: req.user,
     });
 
     const savedSnippet = await newSnippet.save();
@@ -34,7 +36,7 @@ router.post("/", async (req, res) => {
     }
 });
 
-router.put("/:id", async(req, res) => {
+router.put("/:id", Auth, async(req, res) => {
     try{
         const {title, description, code} = req.body;
         const snippetId = req.params.id;
@@ -47,8 +49,11 @@ router.put("/:id", async(req, res) => {
 
         if(!snippetId) return res.status(400).json({ errormessage: "Snippet id not given_ please contact the developer"});
 
-        const originalSnippet = await Snippet.findById(snippetId);
+        const originalSnippet = await SnippetModel.findById(snippetId);
         if(!originalSnippet)  return res.status(400).json({ errormessage: "No Snippet with this ID found_ please contact the developer"});
+
+        if(originalSnippet.user.toString() !== req.user)
+            return res.status(401).json({errormessage: "Unauthorized"});
 
         originalSnippet.title = title;
         originalSnippet.description = description;
@@ -63,7 +68,7 @@ router.put("/:id", async(req, res) => {
     } 
 })
 
-router.delete("/:id", async (req, res) => {
+router.delete("/:id", Auth, async (req, res) => {
     try{
         const snippetId = req.params.id;
         
@@ -71,8 +76,11 @@ router.delete("/:id", async (req, res) => {
 
         if(!snippetId) return res.status(400).json({ errormessage: "Snippet id not given_ please contact the developer"});
 
-        const existingSnippet = await Snippet.findById(snippetId);
+        const existingSnippet = await SnippetModel.findById(snippetId);
         if(!existingSnippet)  return res.status(400).json({ errormessage: "No Snippet with this ID found_ please contact the developer"});
+
+        if(existingSnippet.user.toString() !== req.user)
+            return res.status(401).json({errormessage: "Unauthorized"});
 
         await existingSnippet.delete();
 
